@@ -9,8 +9,10 @@ EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9,+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
 class UserManager(models.Manager):
     def regValidator(self, postData):
         errors = {}
-        if User.objects.filter(email = postData['email']):
-            errors['email_exist'] ="Account exists"
+        if  EMAIL_REGEX.match(postData['email']) == None:
+            errors['email'] = "Invalid Email"
+        elif User.objects.filter(email = postData['email']):
+            errors['email'] ="Account exists"
 
         if len(postData['first_name']) < 3 or not postData['first_name'].isalpha():
             errors['first_name'] = "First Name must be atleast 3 char long and alphas"
@@ -18,12 +20,12 @@ class UserManager(models.Manager):
         if len(postData['last_name']) < 3 or not postData['last_name'].isalpha():
             errors['last_name'] = "Last Name must be atleast 3 char long and alphas"
 
-        if  EMAIL_REGEX.match(postData['email']) == None:
-            errors['email_format'] = "Invalid Email"
+
 
         if len(postData['password']) < 8:
-            errors['password_len'] = "Password must be atleast 8 char"
-        if postData['password'] != postData['pwconf']:
+            errors['password'] = "Password must be atleast 8 char"
+
+        elif postData['password'] != postData['pwconf']:
             errors['pwconf'] = "Passwords doesn't match"
         print(errors)
         return errors
